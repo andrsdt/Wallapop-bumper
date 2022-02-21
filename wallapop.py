@@ -1,9 +1,5 @@
 import requests
-import json
-import time
 import constants as Constants
-from wallapop_signature import generate_xsignature
-from requests.structures import CaseInsensitiveDict
 from aux import headers_http_get, headers_http_put, generate_body_json
 
 

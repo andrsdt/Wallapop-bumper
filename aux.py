@@ -1,5 +1,4 @@
 from wallapop_signature import generate_xsignature
-import os
 import time
 import json
 import constants as Constants
@@ -30,7 +29,7 @@ def headers_http_put():
 def headers_http_get(endpoint):
     headers = {
         'Connection': 'keep-alive',
-        'DeviceID': Constants.DEVICE_ID,
+        'DeviceID': '',
         'X-Signature': None,
         'DNT': '1',
         'Accept-Language': 'es_ES,en-US;q=0.9,es-ES;q=0.8,es;q=0.7,en;q=0.6',

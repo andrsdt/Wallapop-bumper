@@ -3,7 +3,6 @@ import hashlib
 import base64
 import codecs
 
-
 def generate_xsignature(endpoint, method, timestamp):
     # Credits to @rmonvfer https://github.com/rmonvfer/wallapop_secret
     timestamp = timestamp.split(".")[0]
