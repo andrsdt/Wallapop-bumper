@@ -1,3 +1,4 @@
+from math import prod
 import requests
 import constants as Constants
 from aux import headers_http_get, headers_http_put, generate_body_json
@@ -9,6 +10,7 @@ def get_all_product_ids():
     resp = requests.get(url, headers=headers_http_get("items/mine/published",))
     if resp.status_code == 200:
         product_ids = [e['id'] for e in resp.json()]
+    print(f'{len(product_ids)} products found')
     return product_ids
 
 
@@ -18,6 +20,7 @@ def get_user_data():
     if resp.status_code == 200:
         return resp.json()
     else:
+        print("Error getting user data from " + url)
         return None
 
 
@@ -26,7 +29,10 @@ def update_product(product_id):
     data = generate_body_json(item_data=requests.get(
         url+'/vertical').json(), user_data=get_user_data())
     resp = requests.put(url, headers=headers_http_put(),
-                        data=data.encode('utf-8'))
-    if (resp.status_code != 200):
-        print(data)
-    return resp.status_code
+                        data=data.encode('utf-8')
+                        )
+
+    # Print the text in green if 200 OK, otherwise print the text in red
+    color = '\033[92m' if resp.status_code == 200 else '\033[91m'
+
+    print(f'{color} id: {product_id}\tcode: {resp.status_code}')
