@@ -2,6 +2,8 @@ from wallapop_signature import generate_xsignature
 import time
 import json
 import constants as Constants
+import colors as Colors
+from collections import defaultdict
 
 
 def headers_http_put():
@@ -65,24 +67,34 @@ def blank_space_treatment(string):
 def generate_body_json(item_data, user_data):
     # item_data is a json with the data of the item obtained via http get
     # user_data is a json with the data of the user obtained via http get
-    content = item_data['content']
-    body = {
-        'id': item_data['id'],
-        'category_id': str(content['category_id']),
-        'title': content['title'],
-        'sale_price': int(content['sale_price']),
-        'currency_code': content['currency_code'],
-        'description': blank_space_treatment(content['description']),
-        'sale_conditions': content['sale_conditions'],
-        'delivery_info': {
-            'min_weight_kg': int(content['delivery_info']['min_weight_kg']),
-            'max_weight_kg': int(content['delivery_info']['max_weight_kg']),
-            'location': {
-                'address': f'{user_data["location"]["zip"]}, {user_data["location"]["city"]}',
-                'latitude': user_data['location']['approximated_latitude'],
-                'longitude': user_data['location']['approximated_longitude']
-            }
+
+    try:
+        content = item_data['content']
+
+        location = {'address': f'{user_data["location"]["zip"]}, {user_data["location"]["city"]}',
+                    'latitude': user_data['location']['approximated_latitude'],
+                    'longitude': user_data['location']['approximated_longitude']}
+
+        body = {
+            'id': item_data.get('id'),
+            'category_id': str(content.get('category_id')),
+            'title': content['title'],
+            'sale_price': int(content['sale_price']),
+            'currency_code': content['currency_code'],
+            'description': blank_space_treatment(content['description']),
+            'sale_conditions': content['sale_conditions'],
+            'location': location
         }
-    }
-    # missing 'extraInfo', it's not mandatory
-    return json.dumps(body)
+
+        if ('delivery_info' in content):
+            # If the product accepts shipping, the 'location' field is inside the 'delivery_info' object
+            body['location'] = None
+            body['delivery_info'] = {
+                'min_weight_kg': int(content['delivery_info']['min_weight_kg']),
+                'max_weight_kg': int(content['delivery_info']['max_weight_kg']),
+                'location': location,
+            }
+
+        return json.dumps(body)
+    except Exception:
+        print(Colors.RED + "Error generating the body JSON")
